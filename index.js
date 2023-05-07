@@ -4,6 +4,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const cron = require('node-cron');
 const axios = require('axios');
+const schedule = require('node-schedule');
 const {Telegraf} = require('telegraf');
 const username = encodeURIComponent(process.env.MONGO_USER);
 const password = encodeURIComponent(process.env.MONGO_PASS);
@@ -26,7 +27,6 @@ mongoose.connect(uri, {
 // getting user info from bot
 bot.start( async (ctx) => {
     const userId = ctx.from.id;
-    console.log(userId)
     const {id : chatId} = ctx.chat;
   
   try {
@@ -76,29 +76,36 @@ bot.start( async (ctx) => {
 });
 
 
-bot.help((ctx) => ctx.reply('Send me a messgae. I will try t assist you!'));
+bot.help((ctx) => ctx.reply('Send me a messgae. I will try to assist you!'));
 bot.launch();
 
 //schedule the daily eather update at 6 am 
 
-const job = cron.schedule('0 6 * * *', async () => {
+const job = schedule.scheduleJob('0 6 * * *', async () => {
+  
     try {
         const table = mongoose.connection.collection('users');
-      const user = await table.find().toArray();
-  if (user) {
-    const {city, country, name} = user;
-    for (const users of user) {
-        const weatherInfo = await getWeatherInfo(name,city,country);
-        await bot.telegram.sendMessage(user.chatId, weatherInfo);
+       
+      const users = await table.find().toArray();
+      console.log(users)
+      for (const user of users) {
+        if (user) {
+            const {city, country, name , chatId} = user;
+           
+                const weatherInfo = await getWeatherInfo(name,city,country);
+                console.log(weatherInfo)
+                bot.telegram.sendMessage(chatId, weatherInfo);
+              
+            } 
       }
-    } 
+      
+ 
   }catch (error) {
     console.log(error);
   } 
       
   });
 
-  job.start();
 
 //get weather updates
 async function getWeatherInfo(name, city, country) {
