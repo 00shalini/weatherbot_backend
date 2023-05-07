@@ -5,7 +5,7 @@
   command = "nodemon index.js"
 
 [[plugins]]
-  package = "netlify-plugin-lambda"
+  package = "netlify-lambda"
 
 [build.environment]
   NODE_ENV = "production"
