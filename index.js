@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const mongoose = require('mongoose');
-const cron = require('node-cron');
 const axios = require('axios');
 const schedule = require('node-schedule');
 const {Telegraf} = require('telegraf');
@@ -11,6 +10,7 @@ const password = encodeURIComponent(process.env.MONGO_PASS);
 const uri = `mongodb+srv://${username}:${password}@weathercluster.u88zpdy.mongodb.net/weather?retryWrites=true&w=majority`;
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 const weather_api = process.env.OPEN_WEATHER_API_KEY;
+const PORT = process.env.PORT || 3000;
 
 
 // connection establishing with mongo db
@@ -79,7 +79,7 @@ bot.start( async (ctx) => {
 bot.help((ctx) => ctx.reply('Send me a messgae. I will try to assist you!'));
 bot.launch();
 
-//schedule the daily eather update at 6 am 
+//schedule the daily weather update at 6 am 
 
 const job = schedule.scheduleJob('0 6 * * *', async () => {
   
@@ -87,13 +87,11 @@ const job = schedule.scheduleJob('0 6 * * *', async () => {
         const table = mongoose.connection.collection('users');
        
       const users = await table.find().toArray();
-      console.log(users)
       for (const user of users) {
         if (user) {
             const {city, country, name , chatId} = user;
            
                 const weatherInfo = await getWeatherInfo(name,city,country);
-                console.log(weatherInfo)
                 bot.telegram.sendMessage(chatId, weatherInfo);
               
             } 
@@ -124,6 +122,6 @@ async function getWeatherInfo(name, city, country) {
 const app = express();
 app.use(cors());
 
-app.listen(5000, () => {
-    console.log("Server listening on port 5000");
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
 })
