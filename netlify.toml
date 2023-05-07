@@ -1,7 +1,11 @@
 [build]
   functions = "functions"
-  command = "netlify-lambda install && mkdir ./public"
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+  
+[dev]
+  command = "nodemon index.js"
+
+[[plugins]]
+  package = "netlify-plugin-lambda"
+
+[build.environment]
+  NODE_ENV = "production"
