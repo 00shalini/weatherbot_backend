@@ -1,11 +1,7 @@
 [build]
   functions = "functions"
-  
-[dev]
+  command = "netlify-lambda install && mkdir ./public"
   command = "nodemon index.js"
 
-[[plugins]]
-  package = "netlify-lambda"
-
-[build.environment]
+  [build.environment]
   NODE_ENV = "production"
