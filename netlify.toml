@@ -1,0 +1,7 @@
+[build]
+  functions = "functions"
+  command = "npm run build"
+
+[dev]
+  functions = "functions"
+  command = "npm run start:lambda"
