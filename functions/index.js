@@ -10,7 +10,8 @@ const password = encodeURIComponent(process.env.MONGO_PASS);
 const uri = `mongodb+srv://${username}:${password}@weathercluster.u88zpdy.mongodb.net/weather?retryWrites=true&w=majority`;
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 const weather_api = process.env.OPEN_WEATHER_API_KEY;
-const PORT = process.env.PORT || 3000;
+
+const serverless = require('serverless-http')
 
 
 // connection establishing with mongo db
@@ -122,16 +123,5 @@ async function getWeatherInfo(name, city, country) {
 const app = express();
 app.use(cors());
 
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-})
+module.exports.handler = serverless(app);
 
-exports.handler = async event => {
-    try {
-      await bot.handleUpdate(JSON.parse(event.body))
-      return { statusCode: 200, body: "" }
-    } catch (e) {
-      console.error("error in handler:", e)
-      return { statusCode: 400, body: "This endpoint is meant for bot and telegram communication" }
-    }
-  }
