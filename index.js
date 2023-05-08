@@ -10,8 +10,7 @@ const password = encodeURIComponent(process.env.MONGO_PASS);
 const uri = `mongodb+srv://${username}:${password}@weathercluster.u88zpdy.mongodb.net/weather?retryWrites=true&w=majority`;
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 const weather_api = process.env.OPEN_WEATHER_API_KEY;
-const PORT = process.env.PORT || 3000;
-const serverless = require('serverless-http')
+const PORT = 5001;
 
 
 // connection establishing with mongo db
@@ -52,21 +51,24 @@ bot.start( async (ctx) => {
          
          bot.hears(/(.+)/, async (ctx) => {
             if ( step ==0) {
-                name = ctx.match[1];
-    
+                name = ctx.match[1];    
                 ctx.reply(`Hello ${name}! Please tell me your city.`);
                 step++;
             } else if (step ==1) {
-                city = ctx.match[1];
-    
+                city = ctx.match[1];   
                 ctx.reply(`Got it. What is your country?`);
                 step++;
             } else if (step==2) {
-                country = ctx.match[1];
-    
+                country = ctx.match[1];    
                 await table.insertOne({ name, city, country, chatId });
-                ctx.reply(`Thank you for providing your details. I'll send you daily weather updates for ${city}, ${country}.`);
+                ctx.reply(`Thank you for providing your details. I'll send you daily weather updates for ${city}, ${country}.`);               
+                
+            const weatherinfo = await getWeatherInfo(name,city, country);    
+            if (weatherinfo) {
+                bot.telegram.sendMessage(chatId, weatherinfo);
             }
+            }
+           
         })  
        }
   } catch (error) {
