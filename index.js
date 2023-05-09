@@ -28,7 +28,6 @@ mongoose.connect(uri, {
 bot.start( async (ctx) => {
     const userId = ctx.from.id;
     const {id : chatId} = ctx.chat;
-  
   try {
 
     const table = mongoose.connection.collection('users');
