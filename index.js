@@ -99,8 +99,6 @@ const job = schedule.scheduleJob('0 6 * * *', async () => {
               
             } 
       }
-      
- 
   }catch (error) {
     console.log(error);
   } 
